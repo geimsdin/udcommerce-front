@@ -1,0 +1,40 @@
+{
+  "name": "unusualdope/front-laravel-ecommerce",
+  "description": "Frontend package for Laravel ecommerce with FrontController and UrlMapper",
+  "license": "MIT",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Unusualdope",
+      "email": "rozin@unusualdope.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "laravel/framework": "^11.0|^12.0",
+    "laravel/scout": "^10.0",
+    "laravel/socialite": "^5.16",
+    "league/omnipay": "^3",
+    "livewire/livewire": "^4.0",
+    "omnipay/paypal": "^3.0",
+    "omnipay/stripe": "^3.2",
+    "typesense/typesense-php": "^4.9",
+    "unusualdope/laravel-ecommerce": "@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Unusualdope\\FrontLaravelEcommerce\\": "src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Unusualdope\\FrontLaravelEcommerce\\UdFrontLaravelEcommerceServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
