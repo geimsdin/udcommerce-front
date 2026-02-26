@@ -88,8 +88,8 @@ class ProductMiniature extends Component
             : ($product->price ?? 0);
 
         $customer = $this->getCurrentCustomer();
-        $clientGroupId = $customer && $customer->groups()->count() > 0
-            ? $customer->groups()->first()->id
+        $clientGroupIds = $customer && $customer->groups()->count() > 0
+            ? $customer->groups()->pluck('id')->toArray()
             : null;
 
         // Calculate price via model (includes specific prices), then apply exchange rate
@@ -100,7 +100,7 @@ class ProductMiniature extends Component
             $this->quantity,
             true,
             $currency->id ?? null,
-            $clientGroupId,
+            $clientGroupIds,
             $customer?->id
         );
 
@@ -507,8 +507,8 @@ class ProductMiniature extends Component
 
         $currency = Currency::getCurrentCurrency();
         $customer = $this->getCurrentCustomer();
-        $clientGroupId = $customer && $customer->groups()->count() > 0
-            ? $customer->groups()->first()->id
+        $clientGroupIds = $customer && $customer->groups()->count() > 0
+            ? $customer->groups()->pluck('id')->toArray()
             : null;
 
         $price = Product::getPrice(
@@ -518,7 +518,7 @@ class ProductMiniature extends Component
             $this->quantity,
             true,
             $currency->id ?? null,
-            $clientGroupId,
+            $clientGroupIds,
             $customer?->id
         );
         
