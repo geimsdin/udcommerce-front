@@ -24,19 +24,12 @@ Route::middleware(config('ud-front-ecommerce.front_middleware', ['web']))
             ->name('social.redirect');
         Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])
             ->name('social.callback');
-
-        // Payment Routes
-        // Route::get('payment/test-stripe', [\Unusualdope\FrontLaravelEcommerce\Http\Controllers\PaymentController::class, 'testStripe'])
-        //     ->name('payment.test-stripe');
-        // Route::get('payment/test-paypal', [\Unusualdope\FrontLaravelEcommerce\Http\Controllers\PaymentController::class, 'testPaypal'])
-        //     ->name('payment.test-paypal');
         Route::post('payment/checkout', [\Unusualdope\FrontLaravelEcommerce\Http\Controllers\PaymentController::class, 'checkout'])
             ->name('payment.checkout');
         Route::get('payment/{gateway}/success/{payment_id}', [\Unusualdope\FrontLaravelEcommerce\Http\Controllers\PaymentController::class, 'success'])
             ->name('payment.success');
         Route::get('payment/{gateway}/cancel/{payment_id}', [\Unusualdope\FrontLaravelEcommerce\Http\Controllers\PaymentController::class, 'cancel'])
             ->name('payment.cancel');
-
         Route::post('payment/webhook/{gateway}', [\Unusualdope\FrontLaravelEcommerce\Http\Controllers\PaymentController::class, 'webhook'])
             ->name('payment.webhook');
     });

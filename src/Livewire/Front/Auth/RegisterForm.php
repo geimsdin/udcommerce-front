@@ -5,6 +5,7 @@ namespace Unusualdope\FrontLaravelEcommerce\Livewire\Front\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 use Unusualdope\LaravelEcommerce\Models\Customer\Client;
@@ -75,6 +76,7 @@ class RegisterForm extends Component
         $client->user_id = $user->id;
         $client->first_name = $this->first_name;
         $client->last_name = $this->last_name;
+        $client->reference_code = Str::random(10);
         $client->save();
 
         Auth::login($user);

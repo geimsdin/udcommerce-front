@@ -1,6 +1,6 @@
 <div>
     <p class="text-sm text-gray-600 mb-4 font-bold uppercase">
-        Indirizzo di Spedizione
+        {{ __('front-ecommerce::checkout.form.shipping_address') }}
     </p>
 
     @if(!$isEditing && count($addresses) > 0)
@@ -13,7 +13,7 @@
                             class="mt-1 accent-black w-4 h-4">
                         <div class="flex-1">
                             <h3 class="font-bold text-sm tracking-wide uppercase mb-4">
-                                {{ $address->company ?: 'IL MIO INDIRIZZO' }}
+                                {{ $address->company ?: __('front-ecommerce::checkout.form.my_address_label') }}
                             </h3>
                             <div class="text-sm text-gray-600 leading-relaxed font-light">
                                 <p>{{ $address->first_name }} {{ $address->last_name }}</p>
@@ -31,12 +31,12 @@
                     <div class="flex items-center gap-4 mt-6 sm:absolute sm:bottom-6 sm:right-6">
                         <button type="button" wire:click="editAddress({{ $address->id }})"
                             class="cursor-pointer border border-black px-6 py-2 text-xs uppercase tracking-wide hover:bg-gray-50 transition border-solid">
-                            MODIFICA
+                            {{ __('front-ecommerce::checkout.form.actions.edit') }}
                         </button>
                         <button type="button" wire:click="deleteAddress({{ $address->id }})"
-                            wire:confirm="Sei sicuro di voler eliminare questo indirizzo?"
+                            wire:confirm="{{ __('front-ecommerce::checkout.confirm.delete_address') }}"
                             class="cursor-pointer bg-[#2A2A2A] text-white px-6 py-2 text-xs uppercase tracking-wide hover:bg-black transition border border-transparent">
-                            ELIMINA
+                            {{ __('front-ecommerce::checkout.form.actions.delete') }}
                         </button>
                     </div>
                 </div>
@@ -47,19 +47,19 @@
             <button type="button" wire:click="createNewAddress"
                 class="flex items-center gap-2 text-sm text-gray-800 hover:text-black transition cursor-pointer">
                 <span class="bg-[#2A2A2A] text-white w-4 h-4 flex items-center justify-center text-xs">+</span>
-                <span>Aggiungi Indirizzo</span>
+                <span>{{ __('front-ecommerce::checkout.form.actions.add') }}</span>
             </button>
         </div>
 
         <div class="mt-8 pt-8 border-t border-gray-100">
             <label class="flex items-center gap-3 cursor-pointer mb-6">
                 <input type="checkbox" wire:model.live="sameBillingAddress" class="accent-black w-4 h-4 rounded-none">
-                <span class="text-sm text-gray-700">L'indirizzo di fatturazione è uguale a quello di spedizione</span>
+                <span class="text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.same_billing_label') }}</span>
             </label>
 
             @if(!$sameBillingAddress)
                 <p class="text-sm text-gray-600 mb-4 font-bold uppercase mt-8 pt-8 border-t border-gray-100">
-                    Indirizzo di Fatturazione
+                    {{ __('front-ecommerce::checkout.form.billing_address') }}
                 </p>
                 <div class="space-y-4 mb-4">
                     @foreach($addresses as $address)
@@ -70,7 +70,7 @@
                                     class="mt-1 accent-black w-4 h-4">
                                 <div class="flex-1">
                                     <h3 class="font-bold text-sm tracking-wide uppercase mb-4">
-                                        {{ $address->company ?: 'IL MIO INDIRIZZO' }}
+                                        {{ $address->company ?: __('front-ecommerce::checkout.form.my_address_label') }}
                                     </h3>
                                     <div class="text-sm text-gray-600 leading-relaxed font-light">
                                         <p>{{ $address->first_name }} {{ $address->last_name }}</p>
@@ -88,7 +88,7 @@
                             <div class="flex items-center gap-4 mt-6 sm:absolute sm:bottom-6 sm:right-6">
                                 <button type="button" wire:click="editAddress({{ $address->id }})"
                                     class="cursor-pointer border border-black px-6 py-2 text-xs uppercase tracking-wide hover:bg-gray-50 transition border-solid">
-                                    MODIFICA
+                                    {{ __('front-ecommerce::checkout.form.actions.edit') }}
                                 </button>
                             </div>
                         </div>
@@ -105,8 +105,9 @@
         <div class="flex items-center justify-end pt-8">
             <button type="button" wire:click="submitAddress"
                 class="bg-[#2A2A2A] text-white px-10 py-3 text-sm uppercase tracking-wide hover:bg-black transition">
-                <span wire:loading.remove wire:target="submitAddress">Continua</span>
-                <span wire:loading wire:target="submitAddress">Caricamento...</span>
+                <span wire:loading.remove
+                    wire:target="submitAddress">{{ __('front-ecommerce::checkout.form.continue') }}</span>
+                <span wire:loading wire:target="submitAddress">{{ __('front-ecommerce::checkout.form.loading') }}</span>
             </button>
         </div>
         @if($errors->has('selectedAddressId'))
@@ -120,35 +121,36 @@
             <!-- Nome destinazione (destination_name) -->
             <div class="grid grid-cols-12 items-start gap-4">
                 <div class="col-span-3">
-                    <label class="text-sm text-gray-700">Nome destinazione</label>
-                    <p class="text-xs text-gray-400">Opzionale (es. Casa, Ufficio)</p>
+                    <label class="text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.destination_name') }}</label>
+                    <p class="text-xs text-gray-400">{{ __('front-ecommerce::checkout.form.destination_helper') }}</p>
                 </div>
                 <div class="col-span-9">
                     <input type="text" wire:model="destination_name"
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('destination_name') border-red-500 @enderror"
-                        placeholder="es. Casa">
+                        placeholder="{{ __('front-ecommerce::checkout.form.destination_placeholder') }}">
                     @error('destination_name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <!-- Nome -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Nome</label>
+                <label
+                    class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.first_name') }}</label>
                 <div class="col-span-9">
                     <input type="text" wire:model="first_name" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('first_name') border-red-500 @enderror"
-                        placeholder="Simone">
+                        placeholder="{{ __('front-ecommerce::checkout.form.placeholders.first_name') }}">
                     @error('first_name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <!-- Cognome -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Cognome</label>
+                <label class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.last_name') }}</label>
                 <div class="col-span-9">
                     <input type="text" wire:model="last_name" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('last_name') border-red-500 @enderror"
-                        placeholder="Cabiddu">
+                        placeholder="{{ __('front-ecommerce::checkout.form.placeholders.last_name') }}">
                     @error('last_name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -156,8 +158,8 @@
             <!-- Azienda -->
             <div class="grid grid-cols-12 items-start gap-4">
                 <div class="col-span-3">
-                    <label class="text-sm text-gray-700">Azienda</label>
-                    <p class="text-xs text-gray-400">Opzionale</p>
+                    <label class="text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.company') }}</label>
+                    <p class="text-xs text-gray-400">{{ __('front-ecommerce::checkout.form.optional') }}</p>
                 </div>
                 <div class="col-span-9">
                     <input type="text" wire:model="company"
@@ -170,8 +172,8 @@
             <!-- Numero IVA -->
             <div class="grid grid-cols-12 items-start gap-4">
                 <div class="col-span-3">
-                    <label class="text-sm text-gray-700">Numero IVA</label>
-                    <p class="text-xs text-gray-400">Opzionale</p>
+                    <label class="text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.vat_number') }}</label>
+                    <p class="text-xs text-gray-400">{{ __('front-ecommerce::checkout.form.optional') }}</p>
                 </div>
                 <div class="col-span-9">
                     <input type="text" wire:model="vat_number"
@@ -183,11 +185,11 @@
 
             <!-- Indirizzo -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Indirizzo</label>
+                <label class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.address_1') }}</label>
                 <div class="col-span-9">
                     <input type="text" wire:model="address1" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('address1') border-red-500 @enderror"
-                        placeholder="Via San cosimato 13">
+                        placeholder="{{ __('front-ecommerce::checkout.form.placeholders.address_1') }}">
                     @error('address1') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -195,8 +197,8 @@
             <!-- Complemento Indirizzo -->
             <div class="grid grid-cols-12 items-start gap-4">
                 <div class="col-span-3">
-                    <label class="text-sm text-gray-700">Complemento Indirizzo</label>
-                    <p class="text-xs text-gray-400">Opzionale</p>
+                    <label class="text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.complement_label') }}</label>
+                    <p class="text-xs text-gray-400">{{ __('front-ecommerce::checkout.form.optional') }}</p>
                 </div>
                 <div class="col-span-9">
                     <input type="text" wire:model="address2"
@@ -208,33 +210,34 @@
 
             <!-- Codice postale -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Codice postale</label>
+                <label
+                    class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.postal_code') }}</label>
                 <div class="col-span-9">
                     <input type="text" wire:model="postcode" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('postcode') border-red-500 @enderror"
-                        placeholder="00020">
+                        placeholder="{{ __('front-ecommerce::checkout.form.placeholders.postal_code') }}">
                     @error('postcode') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <!-- Città -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Città</label>
+                <label class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.city') }}</label>
                 <div class="col-span-9">
                     <input type="text" wire:model="city" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('city') border-red-500 @enderror"
-                        placeholder="Mandela">
+                        placeholder="{{ __('front-ecommerce::checkout.form.placeholders.city') }}">
                     @error('city') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <!-- Provincia -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Provincia</label>
+                <label class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.province') }}</label>
                 <div class="col-span-9">
                     <select wire:model="province"
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent appearance-none cursor-pointer @error('province') border-red-500 @enderror">
-                        <option value="">Seleziona...</option>
+                        <option value="">{{ __('front-ecommerce::checkout.form.select') }}</option>
                         <option value="AG">Agrigento</option>
                         <option value="AL">Alessandria</option>
                         <option value="AN">Ancona</option>
@@ -348,7 +351,7 @@
             </div>
 
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Nazione</label>
+                <label class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.country') }}</label>
                 <div class="col-span-9">
                     <select wire:model.live="country" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent appearance-none cursor-pointer @error('country') border-red-500 @enderror">
@@ -362,11 +365,11 @@
 
             <!-- Telefono -->
             <div class="grid grid-cols-12 items-center gap-4">
-                <label class="col-span-3 text-sm text-gray-700">Telefono</label>
+                <label class="col-span-3 text-sm text-gray-700">{{ __('front-ecommerce::checkout.form.phone') }}</label>
                 <div class="col-span-9">
                     <input type="tel" wire:model="phone" required
                         class="w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-black transition bg-transparent @error('phone') border-red-500 @enderror"
-                        placeholder="3289267065">
+                        placeholder="{{ __('front-ecommerce::checkout.form.placeholders.phone') }}">
                     @error('phone') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -381,7 +384,7 @@
                         <div class="col-span-3">
                             <label class="text-sm text-gray-700">{{ $field->label }}</label>
                             @if(!$field->is_required)
-                                <p class="text-xs text-gray-400">Opzionale</p>
+                                <p class="text-xs text-gray-400">{{ __('front-ecommerce::checkout.form.optional') }}</p>
                             @endif
                         </div>
                         <div class="col-span-9">
@@ -407,13 +410,14 @@
             <div class="flex items-center justify-center gap-6 pt-8">
                 <button type="submit"
                     class="bg-[#2A2A2A] text-white px-12 py-3 uppercase tracking-wide text-sm hover:bg-black transition disabled:opacity-50 cursor-pointer">
-                    <span wire:loading.remove wire:target="submitAddress">Continua</span>
-                    <span wire:loading wire:target="submitAddress">Salvataggio...</span>
+                    <span wire:loading.remove
+                        wire:target="submitAddress">{{ __('front-ecommerce::checkout.form.continue') }}</span>
+                    <span wire:loading wire:target="submitAddress">{{ __('front-ecommerce::checkout.form.loading') }}</span>
                 </button>
                 {{-- @if(count($addresses) > 0) --}}
                 <button type="button" wire:click="cancelEdit"
                     class="text-sm text-gray-600 hover:text-black underline transition cursor-pointer">
-                    Cancella
+                    {{ __('front-ecommerce::checkout.form.actions.cancel') }}
                 </button>
                 {{-- @endif --}}
             </div>

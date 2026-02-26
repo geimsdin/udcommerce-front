@@ -54,7 +54,7 @@ return [
             'collection-schema' => [
                 'fields' => [
                     ['name' => 'id', 'type' => 'string'],
-                    ['name' => 'title', 'type' => 'string'],
+                    ['name' => 'name', 'type' => 'string'],
                     ['name' => 'link_rewrite', 'type' => 'string'],
                     ['name' => 'status', 'type' => 'int32'],
                     ['name' => 'products_count', 'type' => 'int32'],
