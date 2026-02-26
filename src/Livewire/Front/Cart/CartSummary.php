@@ -41,7 +41,7 @@ class CartSummary extends Component
     public function refreshTotals(): void
     {
         $cart = Cart::getCurrentCart(false);
-        $this->totals = Cart::getTotalsForSummary($cart->id);
+        $this->totals = Cart::getTotalsForSummary();
         $this->currency = Currency::find($cart->currency_id);
 
         // Recalculate discount whenever totals change
