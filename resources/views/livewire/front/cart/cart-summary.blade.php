@@ -116,7 +116,9 @@
                         class="text-sm font-semibold text-gray-500">{{ $currency->symbol ?? ($currency->iso_code ?? '') }}</span>
                 </span>
             </div>
-            <p class="text-xs text-gray-400 mt-1">{{ __('front-ecommerce::cart.vat_included') }}</p>
+            @if ($totals->total_taxes > 0)
+                <p class="text-xs text-gray-400 mt-1">({{ __('front-ecommerce::cart.tax_included') }} {{ $totals->tax }})</p>
+            @endif
         </div>
 
         {{-- Checkout CTA --}}
