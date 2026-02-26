@@ -35,7 +35,7 @@ class UdFrontLaravelEcommerceServiceProvider extends ServiceProvider
      * @var array<int, class-string>
      */
     protected array $gateways = [
-        \Unusualdope\FrontLaravelEcommerce\Payment\Gateways\PaypalPaymentGateway::class,
+        \Unusualdope\LaravelEcommerce\Payment\Gateways\PaypalPaymentGateway::class,
     ];
 
     public function boot(): void
@@ -70,8 +70,8 @@ class UdFrontLaravelEcommerceServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/ud-front-ecommerce.php', 'ud-front-ecommerce');
 
-        $this->app->singleton(\Unusualdope\FrontLaravelEcommerce\Payment\PaymentGatewayManager::class, function ($app) {
-            return new \Unusualdope\FrontLaravelEcommerce\Payment\PaymentGatewayManager();
+        $this->app->singleton(\Unusualdope\LaravelEcommerce\Payment\PaymentGatewayManager::class, function ($app) {
+            return new \Unusualdope\LaravelEcommerce\Payment\PaymentGatewayManager();
         });
 
         // Register package service providers
@@ -134,7 +134,7 @@ class UdFrontLaravelEcommerceServiceProvider extends ServiceProvider
         }
 
         try {
-            $this->app->make(\Unusualdope\FrontLaravelEcommerce\Payment\PaymentGatewayManager::class)->syncGateways();
+            $this->app->make(\Unusualdope\LaravelEcommerce\Payment\PaymentGatewayManager::class)->syncGateways();
         } catch (\Exception $e) {
             if (config('app.debug')) {
                 logger()->warning('[FrontEcommerce] Could not sync payment gateways: ' . $e->getMessage());
