@@ -19,7 +19,7 @@ class UrlMapperIndex extends Component
         // Define directories to scan
         $scanPaths = [
             app_path('Http/Controllers/Front'),
-            base_path('packages/ud-front-laravel-ecommerce/src/Http/Controllers/Front'),
+            base_path('packages/udcommerce-front/src/Http/Controllers/Front'),
         ];
 
         $found = [];
@@ -91,7 +91,7 @@ class UrlMapperIndex extends Component
         $class = str_replace('.php', '', $relativePath);
 
         // Determine namespace based on path
-        if (str_contains($file->getPathname(), 'packages/ud-front-laravel-ecommerce')) {
+        if (str_contains($file->getPathname(), 'packages/udcommerce-front')) {
             return 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front\\'.$class;
         } else {
             return 'App\\Http\\Controllers\\Front\\'.$class;
