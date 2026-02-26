@@ -3,7 +3,7 @@
     {{-- Product Image --}}
     <div class="flex-shrink-0 w-18 h-18 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
         <img
-            src="{{ $product['product_image'] ? asset('storage/' . $product['product_image']) : asset('images/no-image.png') }}"
+            src="{{ $product['product_image'] ? asset('storage/' . $product['product_image']) : 'https://placehold.co/300x300?text=No+Image' }}"
             alt="{{ $product['product_name'] }}"
             class="w-full h-full object-cover"
             style="width:72px;height:72px;"

@@ -6,12 +6,15 @@ use Illuminate\Support\Facades\Config;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Unusualdope\FrontLaravelEcommerce\Support\TypesenseSearchService;
+use Unusualdope\LaravelEcommerce\Models\Administration\Currency;
 use Unusualdope\LaravelEcommerce\Models\Product\Brand;
 use Unusualdope\LaravelEcommerce\Models\Product\ProductCategory;
 
 class ProductCatalog extends Component
 {
     use WithPagination;
+
+    protected $listeners = ['updateCart' => '$refresh'];
 
     /**
      * Keep these in the URL so the catalog is shareable/bookmarkable.
@@ -123,10 +126,19 @@ class ProductCatalog extends Component
 
         $lastPage = $this->perPage > 0 ? (int) ceil($totalProducts / $this->perPage) : 1;
 
+        $currency = Currency::getCurrentCurrency();
+        $exchangeRate = $currency->exchange_rate ?? 1;
+        $priceSymbol = $currency->symbol ?? '€';
+        $priceCurrency = $currency->iso_code ?? 'EUR';
+
         return view('front-ecommerce::livewire.front.catalog.product-catalog', [
             'allBrands' => $allBrands,
             'allCategories' => $allCategories,
             'products' => $products,
+            'currency' => $currency,
+            'exchangeRate' => $exchangeRate,
+            'priceSymbol' => $priceSymbol,
+            'priceCurrency' => $priceCurrency,
             'pagination' => [
                 'total' => $totalProducts,
                 'per_page' => $this->perPage,

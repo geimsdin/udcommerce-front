@@ -9,7 +9,6 @@ use Unusualdope\LaravelEcommerce\Models\Administration\Currency;
 use Unusualdope\LaravelEcommerce\Models\Customer\Client;
 use Unusualdope\LaravelEcommerce\Models\Language;
 use Unusualdope\LaravelEcommerce\Models\Product\Product;
-use Unusualdope\LaravelEcommerce\Models\Product\SpecificPrice;
 
 class ProductMiniature extends Component
 {
@@ -17,6 +16,8 @@ class ProductMiniature extends Component
     public $language;
 
     public $currency;
+
+    protected $listeners = ['updateCart' => 'refreshCurrency'];
 
     public $selectedImageId = null;
 
@@ -32,6 +33,11 @@ class ProductMiniature extends Component
         $this->product = $product->load('languages');
         $this->currency = Currency::getCurrentCurrency();
         $this->quantity = $this->getMinQuantity();
+    }
+
+    public function refreshCurrency(): void
+    {
+        $this->currency = Currency::getCurrentCurrency();
     }
 
     public function getProduct()
@@ -71,7 +77,8 @@ class ProductMiniature extends Component
     public function getFormattedPrice()
     {
         $product = $this->getProduct();
-        if (! $product || ! $this->currency) {
+        $currency = Currency::getCurrentCurrency();
+        if (! $product || ! $currency) {
             return '0,00';
         }
 
@@ -80,98 +87,33 @@ class ProductMiniature extends Component
             ? $variation->price
             : ($product->price ?? 0);
 
-        // Calculate specific price in base currency
-        $price = $this->calculatePrice($product, $variation, $basePrice);
+        $customer = $this->getCurrentCustomer();
+        $clientGroupId = $customer && $customer->groups()->count() > 0
+            ? $customer->groups()->first()->id
+            : null;
+
+        // Calculate price via model (includes specific prices), then apply exchange rate
+        $price = Product::getPrice(
+            $product->id,
+            $variation->id ?? null,
+            $basePrice,
+            $this->quantity,
+            true,
+            $currency->id ?? null,
+            $clientGroupId,
+            $customer?->id
+        );
 
         // Apply currency exchange rate (prices stored in default currency)
-        $rate = $this->currency->exchange_rate ?? 1;
-        $convertedPrice = $price * $rate;
+        $rate = $currency->exchange_rate ?? 1;
+        $convertedPrice = $price['price_with_taxes'] * $rate;
 
-        $symbol = $this->currency->symbol ?? '€';
+        $symbol = $currency->symbol ?? '€';
         $formatted = number_format((float) $convertedPrice, 2, ',', '.');
-
-        return $symbol.' '.$formatted;
-    }
-
-    protected function calculatePrice($product, $variation, $basePrice)
-    {
-        $quantity = $this->quantity;
-        $currencyId = $this->currency->id ?? null;
-        $customer = $this->getCurrentCustomer();
-        $customerId = $customer ? $customer->id : null;
-        $clientGroupId = null;
-        
-        if ($customer && $customer->groups()->count() > 0) {
-            $clientGroupId = $customer->groups()->first()->id;
+        if($price['tax']) {
+            return $symbol . ' ' . $formatted . ' <span class="text-[11px] bg-black text-white font-normal px-[6px] py-[4px] rounded">incl. ' . $price['tax'] . '</span>';
         }
-
-        // Get specific prices for this product
-        $specificPrices = SpecificPrice::where('id_product', $product->id)
-            ->where(function($query) use ($currencyId) {
-                $query->where('id_currency', $currencyId)
-                      ->orWhere('id_currency', 0)
-                      ->orWhereNull('id_currency');
-            })
-            ->where(function($query) use ($clientGroupId) {
-                if ($clientGroupId) {
-                    $query->where('id_client_type', $clientGroupId)
-                          ->orWhere('id_client_type', 0)
-                          ->orWhereNull('id_client_type');
-                } else {
-                    $query->where('id_client_type', 0)
-                          ->orWhereNull('id_client_type');
-                }
-            })
-            ->where(function($query) use ($customerId) {
-                if ($customerId) {
-                    $query->where('id_customer', $customerId)
-                          ->orWhereNull('id_customer');
-                } else {
-                    $query->where('id_customer', 0)
-                    ->orWhereNull('id_customer');
-                }
-            })
-            ->where(function($query) use ($quantity) {
-                $query->where('from_quantity', '<=', $quantity)
-                      ->orWhereNull('from_quantity')
-                      ->orWhere('from_quantity', 0);
-            })
-            ->where(function($query) {
-                $query->where(function($q) {
-                    $q->where('from', '<=', now())
-                      ->orWhereNull('from');
-                })
-                ->where(function($q) {
-                    $q->where('to', '>=', now())
-                      ->orWhereNull('to');
-                });
-            })
-            ->orderBy('from_quantity', 'desc')
-            ->orderBy('id', 'desc')
-            ->get();
-
-        $bestPrice = $basePrice;
-        foreach ($specificPrices as $specificPrice) {
-            $calculatedPrice = $basePrice;
-
-            // Apply specific price or reduction
-            if ($specificPrice->price && $specificPrice->price > 0) {
-                $calculatedPrice = $specificPrice->price;
-            } elseif ($specificPrice->reduction && $specificPrice->reduction > 0) {
-                if ($specificPrice->reduction_type === 'percentage') {
-                    $calculatedPrice = $basePrice * (1 - ($specificPrice->reduction / 100));
-                } else {
-                    $calculatedPrice = $basePrice - $specificPrice->reduction;
-                }
-            }
-
-            // Use the best (lowest) price
-            if ($calculatedPrice < $bestPrice) {
-                $bestPrice = $calculatedPrice;
-            }
-        }
-
-        return max(0, $bestPrice);
+        return $symbol . ' ' . $formatted;
     }
 
     protected function getCurrentCustomer()
@@ -562,16 +504,29 @@ class ProductMiniature extends Component
         $basePrice = $variation && $variation->price > 0 
             ? $variation->price 
             : ($product->price ?? 0);
-        
-        // Calculate price with specific prices
-        $price = $this->calculatePrice($product, $variation, $basePrice);
+
+        $currency = Currency::getCurrentCurrency();
+        $customer = $this->getCurrentCustomer();
+        $clientGroupId = $customer && $customer->groups()->count() > 0
+            ? $customer->groups()->first()->id
+            : null;
+
+        $price = Product::getPrice(
+            $product->id,
+            $variation->id ?? null,
+            $basePrice,
+            $this->quantity,
+            true,
+            $currency->id ?? null,
+            $clientGroupId,
+            $customer?->id
+        );
         
         $stock = $this->getCurrentStock();
         $availability = $stock > 0 
             ? 'https://schema.org/InStock' 
             : 'https://schema.org/OutOfStock';
 
-        $currency = $this->currency;
         $currencyCode = $currency ? ($currency->iso_code ?? 'EUR') : 'EUR';
 
         // Get all product images
@@ -612,7 +567,7 @@ class ProductMiniature extends Component
         // Add offers
         $schema['offers'] = [
             '@type' => 'Offer',
-            'price' => number_format((float)$price, 2, '.', ''),
+            'price' => number_format((float)$price['price_without_taxes'], 2, '.', ''),
             'priceCurrency' => $currencyCode,
             'availability' => $availability,
             'url' => url($this->getProductUrl()),
@@ -651,11 +606,15 @@ class ProductMiniature extends Component
         
         
         $variation = $this->getSelectedVariation();
-        if (!$variation) {
+        if ($product->type === 'variable' && !$variation) {
             session()->flash('status', __('front-ecommerce::products.no_variation_selected'));
             return;
         }
-        Cart::addToCart($product->id, $variation->id, $this->quantity, $this->language->id, $product->name);
+        if($product->type === 'simple') {
+            Cart::addToCart($product->id, null, $this->quantity, $this->language->id, $product->name);
+        } else {
+            Cart::addToCart($product->id, $variation->id, $this->quantity, $this->language->id, $product->name);
+        }
         $this->dispatch('updateCart');
         session()->flash('status', __('front-ecommerce::products.product_added_to_cart'));
         // return redirect()->route('front.cart.index');
@@ -669,7 +628,7 @@ class ProductMiniature extends Component
             'productUrl' => $this->getProductUrl(),
             'selectedVariation' => $this->getSelectedVariation(),
             'currentStock' => $this->getCurrentStock(),
-            'variationsByGroup' => $this->getVariationsByGroup(),
+            'variationsByGroup' => $this->getVariationsByGroup(), 
             'allImages' => $this->getAllImages(),
             'mainImage' => $this->getMainImage(),
             'productSchema' => $this->getProductSchema(),

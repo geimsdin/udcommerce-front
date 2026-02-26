@@ -23,7 +23,7 @@ return [
     'product' => 'Product',
     'price' => 'Price',
     'quantity' => 'Quantity',
-    'vat_included' => 'VAT included',
+    'tax_included' => 'Tax included',
 
     // Coupon
     'coupon_code' => 'Coupon Code',

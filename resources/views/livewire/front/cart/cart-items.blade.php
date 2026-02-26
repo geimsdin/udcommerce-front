@@ -30,7 +30,7 @@
                     <div class="col-span-12 md:col-span-6 flex items-center gap-4">
                         <a href="#" class="flex-shrink-0 block w-24 h-28 md:w-28 md:h-32 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                             <img
-                                src="{{ $product['product_image'] ? asset('storage/' . $product['product_image']) : asset('images/no-image.png') }}"
+                                src="{{ $product['product_image'] ? asset('storage/' . $product['product_image']) : 'https://placehold.co/200x200?text=No+Image' }}"
                                 alt="{{ $product['product_name'] }}"
                                 class="w-full h-full object-cover"
                             >

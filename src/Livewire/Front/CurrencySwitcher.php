@@ -20,7 +20,7 @@ class CurrencySwitcher extends Component
         $this->selectedCurrencyId = $current->id ?? 0;
     }
 
-    public function updatedSelectedCurrencyId(): void
+    public function updatedSelectedCurrencyId()
     {
         $currency = Currency::find($this->selectedCurrencyId);
         if (! $currency) {
@@ -35,8 +35,7 @@ class CurrencySwitcher extends Component
                 'currency_id' => $currency->id,
             ]);
         }
-
-        $this->dispatch('updateCart');
+        $this->js('window.location.reload()');
     }
 
     public function render()

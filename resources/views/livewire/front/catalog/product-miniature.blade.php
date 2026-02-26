@@ -50,9 +50,6 @@
             <!-- Price & stock -->
             <div class="flex items-baseline gap-3" itemprop="offers" itemscope itemtype="https://schema.org/Offer" wire:key="price-{{ $quantity }}">
                 @php
-                    $variation = $selectedVariation ?? null;
-                    $basePrice = $variation && $variation->price > 0 ? $variation->price : ($product->price ?? 0);
-                    // Extract numeric price from formatted price for schema
                     $priceValue = preg_replace('/[^0-9,.]/', '', $formattedPrice);
                     $priceValue = str_replace(',', '.', $priceValue);
                 @endphp
@@ -60,7 +57,7 @@
                 <meta itemprop="priceCurrency" content="{{ $productSchema['offers']['priceCurrency'] ?? 'EUR' }}" />
                 <meta itemprop="availability" content="{{ $currentStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}" />
                 <meta itemprop="url" content="{{ url($productUrl) }}" />
-                <p class="text-2xl font-semibold">{{ $formattedPrice }}</p>
+                <p class="text-2xl font-semibold">{!! $formattedPrice !!}</p>
                 @if ($currentStock > 0)
                     <p class="text-sm text-green-600 font-medium">{{ __('front-ecommerce::products.available') }}</p>
                 @else

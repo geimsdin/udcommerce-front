@@ -151,9 +151,10 @@
 
                             {{-- Price --}}
                             <div class="text-sm text-gray-900" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                                <meta itemprop="priceCurrency" content="EUR" />
+                                <meta itemprop="priceCurrency" content="{{ $priceCurrency ?? 'EUR' }}" />
+                                @php $convertedPrice = ($product->price ?? 0) * ($exchangeRate ?? 1); @endphp
                                 <span itemprop="price"
-                                    content="{{ $product->price }}">{{ number_format($product->price, 2, ',', '.') }} €</span>
+                                    content="{{ number_format((float)$convertedPrice, 2, '.', '') }}">{{ number_format((float)$convertedPrice, 2, ',', '.') }} {{ $priceSymbol ?? '€' }}</span>
                             </div>
                         </div>
                     </div>

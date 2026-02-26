@@ -4,6 +4,7 @@ namespace Unusualdope\FrontLaravelEcommerce\Livewire\Admin\UrlMapper;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Unusualdope\FrontLaravelEcommerce\Models\ClassList;
 use Unusualdope\FrontLaravelEcommerce\Models\UrlMapper;
@@ -52,6 +53,7 @@ class UrlMapperIndex extends Component
 
                 if ($classList->wasRecentlyCreated) {
                     $added++;
+                    $this->createDefaultUrlMappings($fqcn, $name);
                 } else {
                     $updated++;
                 }
@@ -79,6 +81,45 @@ class UrlMapperIndex extends Component
     }
 
     /**
+     * Create default URL mappings for a newly discovered controller.
+     */
+    protected function createDefaultUrlMappings(string $fqcn, string $name): void
+    {
+        $languageModel = config('lmt.language_model', config('ud-front-ecommerce.language_model'));
+        if (! class_exists($languageModel)) {
+            return;
+        }
+
+        $languages = $languageModel::getLanguagesForMultilangForm();
+        $defaultFriendlyUrl = Str::kebab($name);
+
+        foreach ($languages as $lang) {
+            $languageId = (int) ($lang['id'] ?? $lang['language_id'] ?? 0);
+            if ($languageId <= 0) {
+                continue;
+            }
+
+            $friendlyUrl = $defaultFriendlyUrl;
+            $attempt = 0;
+            while (UrlMapper::where('language_id', $languageId)->where('friendly_url', $friendlyUrl)->exists()) {
+                $attempt++;
+                $friendlyUrl = $defaultFriendlyUrl.'-'.$attempt;
+            }
+
+            UrlMapper::updateOrCreate(
+                [
+                    'controller' => $fqcn,
+                    'language_id' => $languageId,
+                ],
+                [
+                    'friendly_url' => $friendlyUrl,
+                    'url_pattern' => null,
+                ]
+            );
+        }
+    }
+
+    /**
      * Get Fully Qualified Class Name from file path
      */
     protected function getFQCNFromFile(\SplFileInfo $file, string $basePath): ?string
@@ -92,7 +133,7 @@ class UrlMapperIndex extends Component
 
         // Determine namespace based on path
         if (str_contains($file->getPathname(), 'packages/udcommerce-front')) {
-            return 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front\\' . $class;
+            return 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front\\'.$class;
         } else {
             return 'App\\Http\\Controllers\\Front\\' . $class;
         }
