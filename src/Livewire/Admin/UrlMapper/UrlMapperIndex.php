@@ -28,7 +28,7 @@ class UrlMapperIndex extends Component
         $updated = 0;
 
         foreach ($scanPaths as $path) {
-            if (! File::exists($path)) {
+            if (!File::exists($path)) {
                 continue;
             }
 
@@ -40,7 +40,7 @@ class UrlMapperIndex extends Component
 
                 $fqcn = $this->getFQCNFromFile($file, $path);
 
-                if (! $fqcn || ! $this->isValidController($fqcn)) {
+                if (!$fqcn || !$this->isValidController($fqcn)) {
                     continue;
                 }
 
@@ -58,7 +58,7 @@ class UrlMapperIndex extends Component
                     $updated++;
                 }
 
-                $found[] = $name.' ('.basename(str_replace('\\', '\\', $fqcn)).')';
+                $found[] = $name . ' (' . basename(str_replace('\\', '\\', $fqcn)) . ')';
             }
         }
 
@@ -135,7 +135,7 @@ class UrlMapperIndex extends Component
         if (str_contains($file->getPathname(), 'packages/udcommerce-front')) {
             return 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front\\'.$class;
         } else {
-            return 'App\\Http\\Controllers\\Front\\'.$class;
+            return 'App\\Http\\Controllers\\Front\\' . $class;
         }
     }
 
@@ -144,14 +144,14 @@ class UrlMapperIndex extends Component
      */
     protected function isValidController(string $fqcn): bool
     {
-        if (! class_exists($fqcn)) {
+        if (!class_exists($fqcn)) {
             return false;
         }
 
         $reflection = new \ReflectionClass($fqcn);
 
         // Check if it has a handle method
-        if (! $reflection->hasMethod('handle')) {
+        if (!$reflection->hasMethod('handle')) {
             return false;
         }
 

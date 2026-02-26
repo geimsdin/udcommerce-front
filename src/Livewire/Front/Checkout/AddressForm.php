@@ -356,13 +356,13 @@ class AddressForm extends Component
         }
 
         if (!$this->selectedAddressId) {
-            $this->addError('selectedAddressId', 'Seleziona un indirizzo di spedizione per continuare.');
+            $this->addError('selectedAddressId', __('front-ecommerce::checkout.validation.select_shipping'));
 
             return;
         }
 
         if (!$this->sameBillingAddress && !$this->selectedBillingAddressId) {
-            $this->addError('selectedBillingAddressId', 'Seleziona un indirizzo di fatturazione per continuare.');
+            $this->addError('selectedBillingAddressId', __('front-ecommerce::checkout.validation.select_billing'));
 
             return;
         }

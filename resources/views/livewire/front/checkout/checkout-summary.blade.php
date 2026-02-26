@@ -6,12 +6,13 @@
             @endphp
 
             <div class="flex justify-between text-sm items-center">
-                <span class="text-gray-500">{{ $totals->total_quantity }}
-                    {{ $totals->total_quantity > 1 ? 'articoli' : 'articolo' }}</span>
+                <span
+                    class="text-gray-500">{{ trans_choice('front-ecommerce::checkout.summary.articles', $totals->total_quantity, ['count' => $totals->total_quantity]) }}</span>
 
                 <button @click="open = !open"
                     class="text-[10px] font-bold bg-[#b10a0a] text-white px-4 py-2 flex items-center gap-2 uppercase tracking-wider transition hover:bg-red-800">
-                    <span x-text="open ? 'Nascondi dettagli' : 'Mostra dettagli'">Mostra dettagli</span>
+                    <span
+                        x-text="open ? '{{ __('front-ecommerce::checkout.summary.hide_details') }}' : '{{ __('front-ecommerce::checkout.summary.show_details') }}'">{{ __('front-ecommerce::checkout.summary.show_details') }}</span>
                     <svg class="w-3 h-3 transition-transform duration-200" :class="open ? '' : 'rotate-180'" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7" />
@@ -35,7 +36,8 @@
                                         class="text-gray-400 normal-case font-normal ml-0.5 whitespace-nowrap">x{{ $product['total_quantity'] }}</span>
                                 </h3>
                                 <span class="text-[14px] font-bold text-gray-900 flex-shrink-0">
-                                    {{ number_format($product['total_price'] * $rate, 2, ',', '.') }} {{ $currency->symbol ?? '€' }}
+                                    {{ number_format($product['total_price'] * $rate, 2, ',', '.') }}
+                                    {{ $currency->symbol ?? '€' }}
                                 </span>
                             </div>
                             @if(!empty($product['variants']))
@@ -51,7 +53,7 @@
             </div>
 
             <div class="flex justify-between text-sm pt-4">
-                <span class="text-gray-600">Totale parziale</span>
+                <span class="text-gray-600">{{ __('front-ecommerce::checkout.summary.subtotal') }}</span>
                 <span class="font-bold">
                     {{ number_format(($totals->total_amount_no_taxes + $totals->total_taxes) * $rate, 2, ',', '.') }}
                     {{ $currency->symbol ?? '€' }}
@@ -59,22 +61,25 @@
             </div>
 
             <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Spedizione</span>
+                <span class="text-gray-600">{{ __('front-ecommerce::checkout.summary.shipping') }}</span>
                 @if ($totals->shipping_cost > 0)
                     <span class="font-bold">
                         {{ number_format($totals->shipping_cost * $rate, 2, ',', '.') }}
                         {{ $currency->symbol ?? '€' }}
                     </span>
                 @elseif(session()->has('checkout.shipping_method'))
-                    <span class="font-bold text-gray-900 tracking-tight">Gratis</span>
+                    <span
+                        class="font-bold text-gray-900 tracking-tight">{{ __('front-ecommerce::checkout.summary.free') }}</span>
                 @else
-                    <span class="font-semibold text-gray-400 italic">Da calcolare</span>
+                    <span
+                        class="font-semibold text-gray-400 italic">{{ __('front-ecommerce::checkout.summary.to_be_calculated') }}</span>
                 @endif
             </div>
 
             @if ($totals->payment_fee > 0)
                 <div class="flex justify-between text-sm text-gray-600">
-                    <span>Commissione {{ session('checkout.payment_method.name', 'pagamento') }}</span>
+                    <span>{{ __('front-ecommerce::checkout.summary.fee') }}
+                        {{ session('checkout.payment_method.name', __('front-ecommerce::checkout.summary.payment')) }}</span>
                     <span class="font-bold">
                         {{ number_format($totals->payment_fee * $rate, 2, ',', '.') }}
                         {{ $currency->symbol ?? '€' }}
@@ -85,7 +90,7 @@
             <hr class="border-gray-100">
 
             <div class="flex justify-between text-[14px] text-gray-700">
-                <span>Totale (Tasse incluse)</span>
+                <span>{{ __('front-ecommerce::checkout.summary.total_tax_included') }}</span>
                 <span class="font-bold text-gray-900">
                     {{ number_format($totals->grand_total * $rate, 2, ',', '.') }}
                     {{ $currency->symbol ?? '€' }}
@@ -94,7 +99,7 @@
 
             <div class="pt-2">
                 <button class="text-[15px] font-medium text-gray-500 hover:text-gray-800 transition">
-                    Hai un codice promozionale?
+                    {{ __('front-ecommerce::checkout.summary.have_promo_code') }}
                 </button>
             </div>
         </div>
@@ -107,15 +112,15 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
-                <span>Pagamento sicuro SSL</span>
+                <span>{{ __('front-ecommerce::checkout.summary.secure_payment_ssl') }}</span>
             </div>
             <div class="flex gap-3 items-start text-xs text-gray-500">
-                <span>I prezzi includono l'IVA applicabile secondo le normative vigenti.</span>
+                <span>{{ __('front-ecommerce::checkout.summary.prices_include_vat') }}</span>
             </div>
         </div>
     @else
         <div class="text-center py-4 text-gray-400 italic">
-            Nessun totale disponibile.
+            {{ __('front-ecommerce::checkout.summary.no_total_available') }}
         </div>
     @endif
 </div>
