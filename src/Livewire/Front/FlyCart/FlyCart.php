@@ -33,6 +33,7 @@ class FlyCart extends Component
         $this->product_data = $cartModel->product_data ?? [];
         $this->cart = $cartModel->only(['id', 'currency_id', 'carrier_id', 'client_id', 'note']);
         $this->totals = Cart::getTotalsForSummary($this->cart['id']);
+        // dd($this->totals);
         $this->total_quantity = $this->totals->total_quantity;
         $this->currency = Currency::find($this->cart['currency_id']);
     }
