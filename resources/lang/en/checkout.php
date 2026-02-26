@@ -77,4 +77,18 @@ return [
         'prices_include_vat' => 'Prices include applicable VAT according to current regulations.',
         'no_total_available' => 'No total available.',
     ],
+
+    'payment' => [
+        'pay_via_cod' => 'Pay via cash on delivery (+3.99 €)',
+        'pay_with_paypal' => 'Pay with PayPal | Simple, fast and secure',
+        'pay_with_stripe' => 'Pay with credit or debit card via Stripe',
+        'pay_with_klarna' => 'Flexible payments with Klarna',
+        'pay_with' => 'Pay with',
+        'pay_with_card_stripe' => 'Pay with Card (Stripe)',
+        'loading' => 'Loading...',
+        'continue' => 'CONTINUE',
+        'terms_accept' => 'I accept the',
+        'terms_of_service' => 'terms of service',
+        'terms_accept_suffix' => 'and I will adhere to them unconditionally.',
+    ],
 ];

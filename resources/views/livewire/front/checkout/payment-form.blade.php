@@ -10,9 +10,9 @@
                         <div class="flex items-center gap-3">
                             <span class="text-sm font-light text-gray-700">
                                 @if($gateway->getSlug() == 'contrassegno')
-                                    Paga tramite contrassegno (+3,99 €)
+                                    {{ __('front-ecommerce::checkout.payment.pay_via_cod') }}
                                 @elseif($gateway->getSlug() == 'paypal')
-                                    Paga con PayPal | È semplice, rapido e sicuro
+                                    {{ __('front-ecommerce::checkout.payment.pay_with_paypal') }}
                                     <span class="inline-block ml-1">
                                         <svg class="w-4 h-4 text-gray-400 inline" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
@@ -21,9 +21,9 @@
                                         </svg>
                                     </span>
                                 @elseif($gateway->getSlug() == 'stripe')
-                                    Paga con carta di credito o debito via Stripe
+                                    {{ __('front-ecommerce::checkout.payment.pay_with_stripe') }}
                                 @elseif($gateway->getSlug() == 'klarna')
-                                    Pagamenti flessibili con Klarna
+                                    {{ __('front-ecommerce::checkout.payment.pay_with_klarna') }}
                                 @else
                                     {{ $gateway->getName() }}
                                 @endif
@@ -54,12 +54,12 @@
                         <button type="button" wire:click.prevent="submit" wire:loading.attr="disabled"
                             class="bg-[#FFC439] hover:bg-[#F2BA36] text-[#003087] font-bold px-8 py-2 rounded-full flex items-center gap-2 transition shadow-sm disabled:opacity-50">
                             <span wire:loading.remove wire:target="submit">
-                                <span>Paga con</span>
+                                <span>{{ __('front-ecommerce::checkout.payment.pay_with') }}</span>
                                 <span class="italic font-extrabold flex inline">
                                     <span>Pay</span><span class="text-[#009cde]">Pal</span>
                                 </span>
                             </span>
-                            <span wire:loading wire:target="submit">Caricamento...</span>
+                            <span wire:loading wire:target="submit">{{ __('front-ecommerce::checkout.payment.loading') }}</span>
                         </button>
                     </div>
                 @endif
@@ -69,9 +69,9 @@
                         <button type="button" wire:click.prevent="submit" wire:loading.attr="disabled"
                             class="bg-[#635BFF] hover:bg-[#5851E0] text-white font-bold px-8 py-2 rounded flex items-center gap-2 transition shadow-sm disabled:opacity-50 text-sm">
                             <span wire:loading.remove wire:target="submit">
-                                Paga con Carta (Stripe)
+                                {{ __('front-ecommerce::checkout.payment.pay_with_card_stripe') }}
                             </span>
-                            <span wire:loading wire:target="submit">Caricamento...</span>
+                            <span wire:loading wire:target="submit">{{ __('front-ecommerce::checkout.payment.loading') }}</span>
                         </button>
                     </div>
                 @endif
@@ -88,11 +88,11 @@
     <!-- TERMS -->
     <div class="pt-6 border-t border-gray-100" x-data="{ terms: @entangle('termsAccepted') }">
         <label class="flex items-start gap-3 cursor-pointer group">
-            <input type="checkbox" x-model="terms"
-                class="mt-1 accent-black w-4 h-4 border-gray-300">
+            <input type="checkbox" x-model="terms" class="mt-1 accent-black w-4 h-4 border-gray-300">
             <span class="text-sm text-gray-600 leading-relaxed">
-                Accetto i <a href="#" class="underline hover:text-black transition">termini del servizio</a> e aderirò a
-                essi incondizionatamente.
+                {{ __('front-ecommerce::checkout.payment.terms_accept') }} <a href="#"
+                    class="underline hover:text-black transition">{{ __('front-ecommerce::checkout.payment.terms_of_service') }}</a>
+                {{ __('front-ecommerce::checkout.payment.terms_accept_suffix') }}
             </span>
         </label>
         @error('termsAccepted')
@@ -104,8 +104,8 @@
         <div class="flex items-center justify-end pt-4">
             <button type="button" wire:click="submit"
                 class="bg-[#2A2A2A] text-white px-12 py-3 text-sm uppercase tracking-wide hover:bg-black transition disabled:opacity-50">
-                <span wire:loading.remove wire:target="submit">CONTINUA</span>
-                <span wire:loading wire:target="submit">Caricamento...</span>
+                <span wire:loading.remove wire:target="submit">{{ __('front-ecommerce::checkout.payment.continue') }}</span>
+                <span wire:loading wire:target="submit">{{ __('front-ecommerce::checkout.payment.loading') }}</span>
             </button>
         </div>
     @endif

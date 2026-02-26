@@ -77,4 +77,18 @@ return [
         'prices_include_vat' => 'I prezzi includono l\'IVA applicabile secondo le normative vigenti.',
         'no_total_available' => 'Nessun totale disponibile.',
     ],
+
+    'payment' => [
+        'pay_via_cod' => 'Paga tramite contrassegno (+3,99 €)',
+        'pay_with_paypal' => 'Paga con PayPal | È semplice, rapido e sicuro',
+        'pay_with_stripe' => 'Paga con carta di credito o debito via Stripe',
+        'pay_with_klarna' => 'Pagamenti flessibili con Klarna',
+        'pay_with' => 'Paga con',
+        'pay_with_card_stripe' => 'Paga con Carta (Stripe)',
+        'loading' => 'Caricamento...',
+        'continue' => 'CONTINUA',
+        'terms_accept' => 'Accetto i',
+        'terms_of_service' => 'termini del servizio',
+        'terms_accept_suffix' => 'e aderirò a essi incondizionatamente.',
+    ],
 ];

@@ -60,27 +60,12 @@ class AddressForm extends Component
         session()->put('checkout.address_id', $value);
         session()->put('checkout.shipping_address_id', $value);
         session()->save();
-
-        $this->syncCartAddresses();
     }
 
     public function updatedSelectedBillingAddressId($value)
     {
         session()->put('checkout.billing_address_id', $value);
         session()->save();
-
-        $this->syncCartAddresses();
-    }
-
-    protected function syncCartAddresses()
-    {
-        $cart = Cart::getCurrentCart(false);
-        if ($cart) {
-            $cart->update([
-                'shipping_address_id' => session('checkout.shipping_address_id'),
-                'billing_address_id' => session('checkout.billing_address_id'),
-            ]);
-        }
     }
 
     public function updatedCountry($value)
@@ -126,7 +111,6 @@ class AddressForm extends Component
                         session()->put('checkout.billing_address_id', $this->selectedAddressId);
                     }
                     session()->save();
-                    $this->syncCartAddresses();
                 }
             }
         }
@@ -187,9 +171,33 @@ class AddressForm extends Component
     {
         $user = Auth::user();
         $this->destination_name = '';
-        $this->first_name = $user->first_name ?? $user->name ?? '';
-        $this->last_name = $user->last_name ?? '';
-        $this->company = $user->company ?? '';
+
+        // first_name and last_name are on the clients table, not users.
+        if ($user) {
+            $client = $user->client ?? Client::where('user_id', $user->id)->first();
+
+            if ($client && $client->first_name) {
+                $this->first_name = $client->first_name;
+                $this->last_name = $client->last_name ?? '';
+            } elseif ($user->name) {
+                // Fallback: split user's full name if no client record yet
+                $nameParts = explode(' ', trim($user->name), 2);
+                $this->first_name = $nameParts[0] ?? '';
+                $this->last_name = $nameParts[1] ?? '';
+            } else {
+                $this->first_name = '';
+                $this->last_name = '';
+            }
+
+            $this->company = $client->company_name ?? '';
+            $this->phone = $client->phone ?? $user->phone ?? '';
+        } else {
+            $this->first_name = '';
+            $this->last_name = '';
+            $this->company = '';
+            $this->phone = '';
+        }
+
         $this->vat_number = '';
         $this->address1 = '';
         $this->address2 = '';
@@ -197,7 +205,6 @@ class AddressForm extends Component
         $this->city = '';
         $this->province = '';
         $this->country = 'IT';
-        $this->phone = $user->phone ?? '';
         $this->custom_fields = [];
         $this->loadCountryCustomFields($this->country);
     }
@@ -300,7 +307,6 @@ class AddressForm extends Component
                 session()->put('checkout.address_id', $this->selectedAddressId);
                 session()->save();
 
-                $this->syncCartAddresses();
 
                 $defaultAddress = $client->addresses()->where('default', true)->first();
                 if ($defaultAddress && ($defaultAddress->id === $this->editingAddressId || count($this->addresses) == 0)) {
@@ -343,8 +349,6 @@ class AddressForm extends Component
             session()->put('checkout.address_id', $this->selectedAddressId);
             session()->save();
 
-            $this->syncCartAddresses();
-
             $this->isEditing = false;
         }
     }
@@ -386,7 +390,6 @@ class AddressForm extends Component
 
             session()->save();
 
-            $this->syncCartAddresses();
         }
 
         return redirect('/shipping');

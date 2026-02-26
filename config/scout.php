@@ -180,7 +180,7 @@ return [
             'retry_interval_seconds' => env('TYPESENSE_RETRY_INTERVAL_SECONDS', 1),
         ],
         // 'max_total_results' => env('TYPESENSE_MAX_TOTAL_RESULTS', 1000),
-    'model-settings' => [
+        'model-settings' => [
             \Unusualdope\LaravelEcommerce\Models\Product\Product::class => [
                 'collection-schema' => [
                     'fields' => [
@@ -205,7 +205,7 @@ return [
                 'collection-schema' => [
                     'fields' => [
                         ['name' => 'id', 'type' => 'string'],
-                        ['name' => 'title', 'type' => 'string'],
+                        ['name' => 'name', 'type' => 'string'],
                         ['name' => 'link_rewrite', 'type' => 'string'],
                         ['name' => 'status', 'type' => 'int32'],
                         ['name' => 'products_count', 'type' => 'int32'],
