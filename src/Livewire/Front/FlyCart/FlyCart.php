@@ -3,6 +3,8 @@
 namespace Unusualdope\FrontLaravelEcommerce\Livewire\Front\FlyCart;
 
 use Livewire\Component;
+use Unusualdope\FrontLaravelEcommerce\Http\Controllers\Front\OrderConfirmationController;
+use Unusualdope\FrontLaravelEcommerce\Models\UrlMapper;
 use Unusualdope\LaravelEcommerce\Models\Administration\Currency;
 use Unusualdope\LaravelEcommerce\Models\Cart\Cart;
 
@@ -56,6 +58,9 @@ class FlyCart extends Component
             'total_quantity' => $this->total_quantity,
             'totals' => $this->totals,
             'currency' => $this->currency,
+            'orderUrlPrefix' => UrlMapper::getFriendlyUrlForController(
+                OrderConfirmationController::class
+            ) ?: 'order',
         ]);
     }
 }

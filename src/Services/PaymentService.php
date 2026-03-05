@@ -3,12 +3,14 @@
 namespace Unusualdope\FrontLaravelEcommerce\Services;
 
 use Illuminate\Http\Request;
-use Unusualdope\FrontLaravelEcommerce\Payment\PaymentGatewayManager;
+use Unusualdope\LaravelEcommerce\Payment\PaymentGatewayManager;
 use Unusualdope\LaravelEcommerce\Models\Payment\Payment;
 
 class PaymentService
 {
-    public function __construct(protected PaymentGatewayManager $gatewayManager) {}
+    public function __construct(protected PaymentGatewayManager $gatewayManager)
+    {
+    }
 
     /**
      * Initiate a purchase.
@@ -17,7 +19,7 @@ class PaymentService
     {
         $gateway = $this->gatewayManager->getGatewayBySlug($gatewaySlug);
 
-        if (! $gateway) {
+        if (!$gateway) {
             throw new \Exception("Payment gateway [{$gatewaySlug}] not found or inactive.");
         }
 
@@ -39,7 +41,7 @@ class PaymentService
         $purchasePayload = [
             'amount' => number_format($params['amount'], 2, '.', ''),
             'currency' => $params['currency'] ?? 'USD',
-            'description' => 'Order #'.($params['order_id'] ?? $transactionId),
+            'description' => 'Order #' . ($params['order_id'] ?? $transactionId),
             'returnUrl' => route('payment.success', ['gateway' => $gatewaySlug, 'payment_id' => $payment->id]),
             'cancelUrl' => route('payment.cancel', ['gateway' => $gatewaySlug, 'payment_id' => $payment->id]),
             'transactionId' => $transactionId,
@@ -76,7 +78,7 @@ class PaymentService
         $gateway = $this->gatewayManager->getGatewayBySlug($gatewaySlug);
         $payment = Payment::findOrFail($paymentId);
 
-        if (! $gateway) {
+        if (!$gateway) {
             throw new \Exception("Payment gateway [{$gatewaySlug}] not found.");
         }
 
@@ -107,7 +109,7 @@ class PaymentService
     {
         $gateway = $this->gatewayManager->getGatewayBySlug($gatewaySlug);
 
-        if (! $gateway) {
+        if (!$gateway) {
             throw new \Exception("Payment gateway [{$gatewaySlug}] not found.");
         }
 

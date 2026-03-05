@@ -3,7 +3,7 @@
 namespace Unusualdope\FrontLaravelEcommerce\Livewire\Front\Checkout;
 
 use Livewire\Component;
-use Unusualdope\FrontLaravelEcommerce\Payment\PaymentGatewayManager;
+use Unusualdope\LaravelEcommerce\Payment\PaymentGatewayManager;
 
 class PaymentForm extends Component
 {
@@ -38,7 +38,7 @@ class PaymentForm extends Component
                 'name' => $gateway::getName(),
             ];
 
-            if ($gateway instanceof \Unusualdope\FrontLaravelEcommerce\Payment\Gateways\CashOnDeliveryPaymentGateway) {
+            if ($gateway instanceof \Unusualdope\LaravelEcommerce\Payment\Gateways\CashOnDeliveryPaymentGateway) {
                 $paymentDetails['fee'] = $gateway->getFee();
             }
 
@@ -77,12 +77,12 @@ class PaymentForm extends Component
             'name' => $gateway::getName(),
         ];
 
-        if ($gateway instanceof \Unusualdope\FrontLaravelEcommerce\Payment\Gateways\BankWirePaymentGateway) {
+        if ($gateway instanceof \Unusualdope\LaravelEcommerce\Payment\Gateways\BankWirePaymentGateway) {
             $paymentDetails['bank_details'] = $gateway->getBankDetails();
             $paymentDetails['finish_message'] = $gateway->getFinishMessage();
         }
 
-        if ($gateway instanceof \Unusualdope\FrontLaravelEcommerce\Payment\Gateways\CashOnDeliveryPaymentGateway) {
+        if ($gateway instanceof \Unusualdope\LaravelEcommerce\Payment\Gateways\CashOnDeliveryPaymentGateway) {
             $paymentDetails['fee'] = $gateway->getFee();
         }
 

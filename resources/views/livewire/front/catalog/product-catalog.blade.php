@@ -95,7 +95,7 @@
                     {{-- Wrapper for Schema Product --}}
                     <div itemprop="item" itemscope itemtype="https://schema.org/Product" class="contents">
                         <meta itemprop="url"
-                            content="{{ url('/product/' . $product->id . '-' . ($product->currentLanguage->link_rewrite ?? $product->id)) }}" />
+                            content="{{ url('/' . $productUrlPrefix . '/' . $product->id . '-' . ($product->currentLanguage->link_rewrite ?? $product->id)) }}" />
                         <meta itemprop="image"
                             content="{{ $product->images->first() ? $product->images->first()->image : '' }}" />
 
@@ -107,7 +107,7 @@
                         @endif
 
                         {{-- Product Image --}}
-                        <a href="/product/{{ $product->id }}-{{ $product->currentLanguage->link_rewrite ?? $product->id }}"
+                        <a href="/{{ $productUrlPrefix }}/{{ $product->id }}-{{ $product->currentLanguage->link_rewrite ?? $product->id }}"
                             class="block bg-gray-50 overflow-hidden"
                             :class="viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-square'">
                             @if($product->images->count() > 0)
@@ -143,7 +143,7 @@
                             {{-- Product Name --}}
                             <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wide mb-1 line-clamp-2"
                                 itemprop="name">
-                                <a href="/product/{{ $product->id }}-{{ $product->currentLanguage->link_rewrite ?? $product->id }}"
+                                <a href="/{{ $productUrlPrefix }}/{{ $product->id }}-{{ $product->currentLanguage->link_rewrite ?? $product->id }}"
                                     class="hover:text-gray-600 transition-colors">
                                     {{ $product->name }}
                                 </a>
@@ -154,7 +154,8 @@
                                 <meta itemprop="priceCurrency" content="{{ $priceCurrency ?? 'EUR' }}" />
                                 @php $convertedPrice = ($product->price ?? 0) * ($exchangeRate ?? 1); @endphp
                                 <span itemprop="price"
-                                    content="{{ number_format((float)$convertedPrice, 2, '.', '') }}">{{ number_format((float)$convertedPrice, 2, ',', '.') }} {{ $priceSymbol ?? '€' }}</span>
+                                    content="{{ number_format((float) $convertedPrice, 2, '.', '') }}">{{ number_format((float) $convertedPrice, 2, ',', '.') }}
+                                    {{ $priceSymbol ?? '€' }}</span>
                             </div>
                         </div>
                     </div>
@@ -207,4 +208,3 @@
         </div>
     @endif
 </div>
-

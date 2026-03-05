@@ -5,6 +5,7 @@ namespace Unusualdope\FrontLaravelEcommerce\Livewire\Front\Catalog;
 use Illuminate\Support\Facades\Config;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Unusualdope\FrontLaravelEcommerce\Models\UrlMapper;
 use Unusualdope\FrontLaravelEcommerce\Support\TypesenseSearchService;
 use Unusualdope\LaravelEcommerce\Models\Administration\Currency;
 use Unusualdope\LaravelEcommerce\Models\Product\Brand;
@@ -139,6 +140,9 @@ class ProductCatalog extends Component
             'exchangeRate' => $exchangeRate,
             'priceSymbol' => $priceSymbol,
             'priceCurrency' => $priceCurrency,
+            'productUrlPrefix' => UrlMapper::getFriendlyUrlForController(
+                \Unusualdope\FrontLaravelEcommerce\Http\Controllers\Front\ProductController::class
+            ) ?: 'product',
             'pagination' => [
                 'total' => $totalProducts,
                 'per_page' => $this->perPage,
