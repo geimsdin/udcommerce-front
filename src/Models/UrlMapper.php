@@ -36,7 +36,7 @@ class UrlMapper extends Model
             return $this->friendly_url;
         }
 
-        return $this->friendly_url.'/'.$this->url_pattern;
+        return $this->friendly_url . '/' . $this->url_pattern;
     }
 
     /**
@@ -107,7 +107,7 @@ class UrlMapper extends Model
      */
     public function hasPattern(): bool
     {
-        return ! empty($this->url_pattern);
+        return !empty($this->url_pattern);
     }
 
     /**
@@ -125,5 +125,30 @@ class UrlMapper extends Model
         preg_match_all('/\{([a-zA-Z0-9_]+)\}/', $this->url_pattern, $matches);
 
         return $matches[1] ?? [];
+    }
+
+    /**
+     * Get the friendly URL prefix for a given controller class and optional language.
+     * Falls back to the current app locale's language if no languageId given.
+     */
+    public static function getFriendlyUrlForController(string $controller, ?int $languageId = null): string
+    {
+        if ($languageId === null) {
+            $languageModel = config('ud-front-ecommerce.language_model');
+            if ($languageModel) {
+                $locale = session('locale', app()->getLocale());
+                $language = $languageModel::where('iso_code', $locale)->first();
+                $languageId = $language?->id;
+            }
+        }
+
+        if ($languageId) {
+            return static::where('controller', $controller)
+                ->where('language_id', $languageId)
+                ->value('friendly_url') ?? '';
+        }
+
+        return static::where('controller', $controller)
+            ->value('friendly_url') ?? '';
     }
 }

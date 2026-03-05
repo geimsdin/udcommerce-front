@@ -76,7 +76,7 @@
                 </div>
 
                 <!-- Checkout Button -->
-                <a href="/order" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                <a href="/{{ $orderUrlPrefix }}" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
                     {{ __('front-ecommerce::cart.proceed_to_checkout') }}
                 </a>
             </div>
