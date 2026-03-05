@@ -12,43 +12,45 @@ use Unusualdope\FrontLaravelEcommerce\Models\UrlMapper;
 class UrlMapperIndex extends Component
 {
     public string $statusMessage = '';
-
     public int $notificationKey = 0;
+
+    /**
+     * Map of absolute directory path → PHP namespace root.
+     * Add more entries here to scan additional directories.
+     */
+    protected function scanPaths(): array
+    {
+        return [
+            app_path('Http/Controllers/Front')
+            => 'App\\Http\\Controllers\\Front',
+
+            base_path('vendor/unusualdope/front-laravel-ecommerce/src/Http/Controllers/Front')
+            => 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front',
+        ];
+    }
 
     public function scan(): void
     {
-        // Define directories to scan
-        $scanPaths = [
-            app_path('Http/Controllers/Front'),
-            base_path('packages/udcommerce-front/src/Http/Controllers/Front'),
-        ];
-
-        $found = [];
         $added = 0;
         $updated = 0;
 
-        foreach ($scanPaths as $path) {
+        foreach ($this->scanPaths() as $path => $namespace) {
             if (!File::exists($path)) {
                 continue;
             }
 
-            $files = File::files($path);
-            foreach ($files as $file) {
+            foreach (File::files($path) as $file) {
                 if ($file->getExtension() !== 'php') {
                     continue;
                 }
 
-                $fqcn = $this->getFQCNFromFile($file, $path);
+                $fqcn = $namespace . '\\' . $file->getBasename('.php');
 
-                if (!$fqcn || !$this->isValidController($fqcn)) {
+                if (!$this->isValidController($fqcn)) {
                     continue;
                 }
 
-                // Extract display name from class name
-                $className = $file->getBasename('.php');
-                $name = str_replace('Controller', '', $className);
-
-                // Register or update
+                $name = str_replace('Controller', '', $file->getBasename('.php'));
                 $classList = ClassList::register($name, $fqcn, 'front_controller');
 
                 if ($classList->wasRecentlyCreated) {
@@ -57,27 +59,29 @@ class UrlMapperIndex extends Component
                 } else {
                     $updated++;
                 }
-
-                $found[] = $name . ' (' . basename(str_replace('\\', '\\', $fqcn)) . ')';
             }
         }
 
-        // Clear cache so changes take effect
         Artisan::call('config:clear');
 
-        $message = 'Scanned controllers. ';
-        if ($added > 0) {
-            $message .= " Added {$added} new. ";
-        }
-        if ($updated > 0) {
-            $message .= " Updated {$updated} existing.";
-        }
+        $this->statusMessage = $this->buildStatusMessage($added, $updated);
+        $this->notificationKey++;
+    }
+
+    /**
+     * Build a human-readable scan result message.
+     */
+    protected function buildStatusMessage(int $added, int $updated): string
+    {
         if ($added === 0 && $updated === 0) {
-            $message .= ' No new controllers found.';
+            return 'Scanned controllers. No new controllers found.';
         }
 
-        $this->statusMessage = $message;
-        $this->notificationKey++;
+        return trim(implode(' ', array_filter([
+            'Scanned controllers.',
+            $added > 0 ? "Added {$added} new." : '',
+            $updated > 0 ? "Updated {$updated} existing." : '',
+        ])));
     }
 
     /**
@@ -86,88 +90,56 @@ class UrlMapperIndex extends Component
     protected function createDefaultUrlMappings(string $fqcn, string $name): void
     {
         $languageModel = config('lmt.language_model', config('ud-front-ecommerce.language_model'));
-        if (! class_exists($languageModel)) {
+
+        if (!class_exists($languageModel)) {
             return;
         }
 
-        $languages = $languageModel::getLanguagesForMultilangForm();
-        $defaultFriendlyUrl = Str::kebab($name);
+        $defaultSlug = Str::kebab($name);
 
-        foreach ($languages as $lang) {
+        foreach ($languageModel::getLanguagesForMultilangForm() as $lang) {
             $languageId = (int) ($lang['id'] ?? $lang['language_id'] ?? 0);
+
             if ($languageId <= 0) {
                 continue;
             }
 
-            $friendlyUrl = $defaultFriendlyUrl;
-            $attempt = 0;
-            while (UrlMapper::where('language_id', $languageId)->where('friendly_url', $friendlyUrl)->exists()) {
-                $attempt++;
-                $friendlyUrl = $defaultFriendlyUrl.'-'.$attempt;
-            }
-
             UrlMapper::updateOrCreate(
-                [
-                    'controller' => $fqcn,
-                    'language_id' => $languageId,
-                ],
-                [
-                    'friendly_url' => $friendlyUrl,
-                    'url_pattern' => null,
-                ]
+                ['controller' => $fqcn, 'language_id' => $languageId],
+                ['friendly_url' => $this->uniqueFriendlyUrl($languageId, $defaultSlug), 'url_pattern' => null]
             );
         }
     }
 
     /**
-     * Get Fully Qualified Class Name from file path
+     * Return a slug that doesn't collide with existing URL mappings for the given language.
      */
-    protected function getFQCNFromFile(\SplFileInfo $file, string $basePath): ?string
+    protected function uniqueFriendlyUrl(int $languageId, string $base): string
     {
-        $relativePath = str_replace($basePath, '', $file->getPathname());
-        $relativePath = str_replace(['/', '\\'], '\\', $relativePath);
-        $relativePath = ltrim($relativePath, '\\');
+        $slug = $base;
+        $attempt = 0;
 
-        // Remove .php extension
-        $class = str_replace('.php', '', $relativePath);
-
-        // Determine namespace based on path
-        if (str_contains($file->getPathname(), 'packages/udcommerce-front')) {
-            return 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front\\'.$class;
-        } else {
-            return 'App\\Http\\Controllers\\Front\\' . $class;
+        while (UrlMapper::where('language_id', $languageId)->where('friendly_url', $slug)->exists()) {
+            $slug = $base . '-' . ++$attempt;
         }
+
+        return $slug;
     }
 
     /**
-     * Check if class is a valid controller
+     * Return true if the class exists and exposes a handle() method.
      */
     protected function isValidController(string $fqcn): bool
     {
-        if (!class_exists($fqcn)) {
-            return false;
-        }
-
-        $reflection = new \ReflectionClass($fqcn);
-
-        // Check if it has a handle method
-        if (!$reflection->hasMethod('handle')) {
-            return false;
-        }
-
-        return true;
+        return class_exists($fqcn)
+            && (new \ReflectionClass($fqcn))->hasMethod('handle');
     }
 
     public function render()
     {
         $controllers = ClassList::frontControllers()
             ->get()
-            ->map(function ($item) {
-                return [
-                    'name' => $item->name,
-                    'controller' => $item->fqcn,
-                ];
-            })
+            ->map(fn($item) => ['name' => $item->name, 'controller' => $item->fqcn])
             ->toArray();
 
         $mappings = UrlMapper::query()
@@ -175,9 +147,6 @@ class UrlMapperIndex extends Component
             ->get()
             ->groupBy('controller');
 
-        return view('front-ecommerce::livewire.admin.url-mapper.url-mapper-index', [
-            'controllers' => $controllers,
-            'mappings' => $mappings,
-        ]);
+        return view('front-ecommerce::livewire.admin.url-mapper.url-mapper-index', compact('controllers', 'mappings'));
     }
 }
