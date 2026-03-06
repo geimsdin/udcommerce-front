@@ -24,7 +24,7 @@ class UrlMapperIndex extends Component
             app_path('Http/Controllers/Front')
             => 'App\\Http\\Controllers\\Front',
 
-            base_path('vendor/unusualdope/front-laravel-ecommerce/src/Http/Controllers/Front')
+            base_path('packages/udcommerce-front/src/Http/Controllers/Front')
             => 'Unusualdope\\FrontLaravelEcommerce\\Http\\Controllers\\Front',
         ];
     }
